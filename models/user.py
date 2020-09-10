@@ -39,4 +39,4 @@ class User(BaseModel, Base):
         """
         if k = "password":
             v = hashlib.md5(v).hexdigest()
-        super()__setattr__(k, v)
+        super().__setattr__(k, v)
