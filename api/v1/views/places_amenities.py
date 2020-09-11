@@ -6,16 +6,18 @@ from api.v1.views import app_views
 from flask import Flask, jsonify, abort, request
 from models import storage
 from models.place import Place
-from models.city import City
-from models.user import User
+from models.amenity import Amenity
 import os
 
 
 @app_views.route("/places/<place_id>/amenities", methods=['GET'],
                  strict_slashes=False)
-def GET_all_Place_amenities(place_id):
+def GET_Place_amenities(place_id):
     """ Returns JSON list of all `Amenity` instances associated
     with a given `Place` instance in storage
+
+    Args:
+        place_id: uuid of `Place` instance in storage
 
     Return:
         JSON list of all `Amenity` instances for a given `Place` instance
@@ -23,14 +25,10 @@ def GET_all_Place_amenities(place_id):
     place = storage.get(Place, place_id)
 
     if place:
-        am_list = []
-        if os.getenv('HBNB_TYPE_STORAGE') == 'db':
-            am_objs = place.amenities
-        else:
-            am_objs = place.amenity_ids
-        for am in am_objs:
-            am_list.append(am.to_dict())
-        return jsonify(am_list.to_dict())
+        amenity_list = []
+        for amenity in place.amenities:
+            amenity_list.append(amenity.to_dict())
+        return (jsonify(amenity_list))
     else:
         abort(404)
 
@@ -53,10 +51,7 @@ def DELETE_Place_amenities(place_id, amenity_id):
     amenity = storage.get(Amenity, amenity_id)
 
     if place and amenity and amenity in place.amenities:
-        if os.getenv("HBNB_TYPE_STORAGE") == "db":
-            place.amenities.remove(amenity)
-        else:
-            place.amenity_ids.remove(amenity)
+        place.amenities.remove(amenity)
         storage.save()
         return ({})
     else:
@@ -69,25 +64,24 @@ def POST_Place_amenities(place_id, amenity_id):
     """ Links a new `Amenity` instance to a `Place` instance in storage,
     by ids in URI subpath
 
+    Args:
+        place_id: uuid of `Place` instance in storage
+        amenity_id: uuid of `Amenity` instance in storage
+
     Return:
         Linked `Amenity` instance and response status 201, or 404 response
     on error
     """
     place = storage.get(Place, place_id)
-    amenity = storage.get(Amenities, amenity_id)
+    amenity = storage.get(Amenity, amenity_id)
+    print(amenity.to_dict())
 
     if place and amenity:
-        if os.getenv('HBNB_TYPE_STORAGE') == 'db':
-            if amenity in place.amenities:
-                return (jsonify(amenity.to_dict()))
-            else:
-                place.amenities.append(amenity)
+        if amenity in place.amenities:
+            return (jsonify(amenity.to_dict()))
         else:
-            if amenity in place.amenity_ids:
-                return (jsonify(amenity.to_dict()))
-            else:
-                place.amenity_ids.append(amenity)
-        place.save()
+            place.amenities.append(amenity)
+        storage.save()
         return (jsonify(amenity.to_dict()), 201)
     else:
         abort(404)
