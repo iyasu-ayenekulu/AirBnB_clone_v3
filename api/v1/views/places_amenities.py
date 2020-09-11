@@ -74,7 +74,6 @@ def POST_Place_amenities(place_id, amenity_id):
     """
     place = storage.get(Place, place_id)
     amenity = storage.get(Amenity, amenity_id)
-    print(amenity.to_dict())
 
     if place and amenity:
         if amenity in place.amenities:
