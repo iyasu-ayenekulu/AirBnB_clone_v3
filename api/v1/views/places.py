@@ -8,6 +8,8 @@ from models import storage
 from models.place import Place
 from models.city import City
 from models.user import User
+from models.state import State
+from models.amenity import Amenity
 
 
 @app_views.route("/cities/<city_id>/places", methods=['GET'],
@@ -131,3 +133,73 @@ def PUT_Place(place_id):
         return (jsonify(place.to_dict()))
     else:
         abort(404)
+
+
+@app_views.route("/places_search", methods=['POST'],
+                 strict_slashes=False)
+def places_search():
+    """ Retrieves a JSON list of `Place` instances corresponding to lists of
+    ids incldued in the body of the request.
+
+    JSON request body can contain 3 optional keys:
+        "states": list of `State` uuids
+            lists each `Place` for each `City` for each `State`
+        "cities": list of `City` uuids
+            lists each `Place` for each `City`
+        "amenities": list of `Amenity` uuids
+            list each `Place` that has all listed `Amenity` relationships
+
+    Return:
+        JSON list of `Place` instances, status 200
+    """
+    req_dict = request.get_json()
+
+    if not req_dict:
+        return (jsonify({'error': 'Not a JSON'}), 400)
+
+    all_Place = []
+    for place in storage.all(Place).values():
+        all_Place.append(place)
+
+    invalid_id = False
+    place_list = []
+    city_list = []
+    if 'states' in req_dict:
+        for state_id in req_dict['states']:
+            state = storage.get(State, state_id)
+            if state:
+                for city in state.cities:
+                    city_list.append(city)
+                    for place in city.places:
+                        place_list.append(place.to_dict())
+            else:
+                invalid_id = True
+
+    if 'cities' in req_dict:
+        for city_id in req_dict['cities']:
+            city = storage.get(City, city_id)
+            if city:
+                if city not in city_list:
+                    for place in city.places:
+                        place_list.append(place.to_dict())
+            else:
+                invalid_id = True
+
+    amenity_list = []
+    if 'amenities' in req_dict:
+        for amenity_id in req_dict['amenities']:
+            amenity = storage.get(Amenity, amenity_id)
+            if amenity:
+                amenity_list.append(amenity)
+            else:
+                invalid_id = True
+        for place in all_Place:
+            if all(amenity in place.amenities for amenity in amenity_list):
+                place_dict = place.to_dict()
+                del place_dict['amenities']
+                place_list.append(place_dict)
+
+    if len(req_dict) == 0 or (len(place_list) == 0 and not invalid_id):
+        return jsonify([place.to_dict() for place in all_Place])
+    else:
+        return jsonify(place_list)
