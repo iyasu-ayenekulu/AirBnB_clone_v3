@@ -59,12 +59,11 @@ def DELETE_Place_amenities(place_id, amenity_id):
             place.amenity_ids.remove(amenity)
         storage.save()
         return ({})
-
     else:
         abort(404)
 
 
-@app_views.route('/olaces/<place_id>/amenities/<amenity_id>', methods=['POST'],
+@app_views.route('/places/<place_id>/amenities/<amenity_id>', methods=['POST'],
                  strict_slashes=False)
 def POST_Place_amenities(place_id, amenity_id):
     """ Links a new `Amenity` instance to a `Place` instance in storage,
