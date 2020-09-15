@@ -139,30 +139,30 @@ def PUT_Place(place_id):
                  strict_slashes=False)
 def places_search():
     """ Retrieves a JSON list of `Place` instances corresponding to lists of
-    ids incldued in the body of the request.
+    ids included in the body of the request.
 
     JSON request body can contain 3 optional keys:
         "states": list of `State` uuids
-            lists each `Place` for each `City` for each `State`
+            adds each `Place` for each `City` for each `State` to list
         "cities": list of `City` uuids
-            lists each `Place` for each `City`
+            lists each `Place` for each `City` to list
         "amenities": list of `Amenity` uuids
-            list each `Place` that has all listed `Amenity` relationships
+            filters `Place` list by only those that have all listed amenities
+
+        If entire request dict is empty, or both "state" and "city" are missing
+    or empty, all `Place` instances in storage are added to list, before
+    filtering by amenity.
 
     Return:
-        JSON list of `Place` instances, status 200
+        JSON list of `Place` instances, status 200, or status 400 for invalid
+    JSON
     """
-    req_dict = request.get_json()
-
-    if not req_dict:
+    if request.is_json:
+        req_dict = request.get_json()
+    else:
         return (jsonify({'error': 'Not a JSON'}), 400)
 
-    all_Place = []
-    for place in storage.all(Place).values():
-        all_Place.append(place)
-
-    invalid_id = False
-    place_list = []
+    # complile list of all cities for named states + individually named cities
     city_list = []
     if 'states' in req_dict:
         for state_id in req_dict['states']:
@@ -170,36 +170,45 @@ def places_search():
             if state:
                 for city in state.cities:
                     city_list.append(city)
-                    for place in city.places:
-                        place_list.append(place.to_dict())
-            else:
-                invalid_id = True
 
     if 'cities' in req_dict:
         for city_id in req_dict['cities']:
             city = storage.get(City, city_id)
             if city:
                 if city not in city_list:
-                    for place in city.places:
-                        place_list.append(place.to_dict())
-            else:
-                invalid_id = True
+                    city_list.append(city)
 
+    # list all places to be found in those cities
+    place_list = []
+    for city in city_list:
+        for place in city.places:
+            place_list.append(place)
+
+    # if no states or cities with valid ids provided, defaults to all places
+    if len(place_list) == 0:
+        for place in storage.all(Place).values():
+            place_list.append(place)
+
+    # filter places to only include those that share all listed amenities
     amenity_list = []
     if 'amenities' in req_dict:
         for amenity_id in req_dict['amenities']:
             amenity = storage.get(Amenity, amenity_id)
             if amenity:
                 amenity_list.append(amenity)
-            else:
-                invalid_id = True
-        for place in all_Place:
-            if all(amenity in place.amenities for amenity in amenity_list):
-                place_dict = place.to_dict()
-                del place_dict['amenities']
-                place_list.append(place_dict)
 
-    if len(req_dict) == 0 or (len(place_list) == 0 and not invalid_id):
-        return jsonify([place.to_dict() for place in all_Place])
-    else:
-        return jsonify(place_list)
+        filtered_place_list = place_list.copy()
+        for place in place_list:
+            if not all(amenity in place.amenities for amenity in amenity_list):
+                filtered_place_list.remove(place)
+        place_list = filtered_place_list
+
+    # prepare return list
+    place_dict_list = []
+    for place in place_list:
+        place_dict = place.to_dict()
+        if 'amenities' in place_dict:
+            del place_dict['amenities']
+        place_dict_list.append(place_dict)
+
+    return jsonify(place_dict_list)
