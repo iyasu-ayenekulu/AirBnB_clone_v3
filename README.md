@@ -3,16 +3,16 @@
 The AirBnB project arc, part of Holberton School's [Higher-level Programming track](https://github.com/allelomorph/holbertonschool-higher_level_programming/), spans 7 assignments and 4 repositories. All were team projects. In order to practice navigating an existing code base, for v2 through v4, students began that revision by forking a senior student team's repository for the previous version.
 
 * [`AirBnB_clone`](https://github.com/allelomorph/AirBnB_clone/)
-  * [(263) 0x00. AirBnB clone - The console](https://github.com/allelomorph/AirBnB_clone/PROJECT_0x00.md)
-  * [(268) 0x01. AirBnB clone - Web static](https://github.com/allelomorph/AirBnB_clone/PROJECT_0x01.md)
+  * [(263) 0x00. AirBnB clone - The console](https://github.com/allelomorph/AirBnB_clone/blob/master/PROJECT_0x00.md)
+  * [(268) 0x01. AirBnB clone - Web static](https://github.com/allelomorph/AirBnB_clone/blob/master/PROJECT_0x01.md)
 * [`AirBnB_clone_v2`](https://github.com/allelomorph/AirBnB_clone_v2/)
-  * [(289) 0x02. AirBnB clone - MySQL](https://github.com/allelomorph/AirBnB_clone_v2/PROJECT_0x02.md)
-  * [(288) 0x03. AirBnB clone - Deploy static](https://github.com/allelomorph/AirBnB_clone_v2/PROJECT_0x03.md)
-  * [(290) 0x04. AirBnB clone - Web framework](https://github.com/allelomorph/AirBnB_clone_v2/PROJECT_0x04.md)
+  * [(289) 0x02. AirBnB clone - MySQL](https://github.com/allelomorph/AirBnB_clone_v2/blob/master/PROJECT_0x02.md)
+  * [(288) 0x03. AirBnB clone - Deploy static](https://github.com/allelomorph/AirBnB_clone_v2/blob/master/PROJECT_0x03.md)
+  * [(290) 0x04. AirBnB clone - Web framework](https://github.com/allelomorph/AirBnB_clone_v2/blob/master/PROJECT_0x04.md)
 * `AirBnB_clone_v3`
   * [(301) 0x05. AirBnB clone - RESTful API](./PROJECT_0x05.md)
 * [`AirBnB_clone_v4`](https://github.com/allelomorph/AirBnB_clone_v4/)
-  * [(309) 0x06. AirBnB clone - Web dynamic](https://github.com/allelomorph/AirBnB_clone_v4/PROJECT_0x06.md)
+  * [(309) 0x06. AirBnB clone - Web dynamic](https://github.com/allelomorph/AirBnB_clone_v4/blob/master/PROJECT_0x06.md)
 
 What follows below is the original README that appeared in the forked v2 repository.
 
